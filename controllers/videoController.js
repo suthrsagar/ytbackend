@@ -29,17 +29,19 @@ exports.getVideos = async (req, res) => {
 // @access  Private
 exports.uploadVideo = async (req, res) => {
   try {
-    const { title, description, videoUrl, thumbnailUrl, duration, category, tags } = req.body;
+    const { title, description, videoUrl, thumbnailUrl, duration, type, category, tags } = req.body;
     
-    // Automatically classify as short if duration < 60
-    const calculatedType = (duration && duration < 60) ? 'short' : 'video';
+    let finalType = type;
+    if (!finalType || finalType === 'auto') {
+      finalType = (duration && duration < 60) ? 'short' : 'video';
+    }
 
     const newVideo = new Video({
       title,
       description,
       videoUrl,
       thumbnailUrl,
-      type: calculatedType,
+      type: finalType,
       duration: duration || 0,
       category: category || 'All',
       tags: tags || [],
