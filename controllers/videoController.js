@@ -31,8 +31,16 @@ exports.getVideos = async (req, res) => {
 // @access  Private
 exports.uploadVideo = async (req, res) => {
   try {
-    const { title, description, videoUrl, thumbnailUrl, duration, type, category, tags } = req.body;
+    const { title, description, duration, type, category, tags } = req.body;
     
+    // Fallback to req.body in case it was sent as string, but prefer req.files from multer
+    const videoUrl = req.files?.video ? req.files.video[0].path : req.body.videoUrl;
+    const thumbnailUrl = req.files?.thumbnail ? req.files.thumbnail[0].path : req.body.thumbnailUrl;
+
+    if (!videoUrl) {
+      return res.status(400).json({ message: 'Video file or URL is required' });
+    }
+
     const user = await User.findById(req.user.id);
     if (!user.channelId) {
       return res.status(400).json({ message: 'Channel is required to upload a video. Please create a channel first.' });

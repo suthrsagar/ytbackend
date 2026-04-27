@@ -12,7 +12,8 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'streamsphere',
-    allowedFormats: ['jpg', 'png', 'jpeg', 'mp4']
+    allowedFormats: ['jpg', 'png', 'jpeg', 'mp4'],
+    resource_type: 'auto'
   }
 });
 

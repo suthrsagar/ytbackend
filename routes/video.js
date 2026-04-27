@@ -9,10 +9,11 @@ const {
   getVideoComments 
 } = require('../controllers/videoController');
 const { protect } = require('../middlewares/auth');
+const { upload } = require('../utils/cloudinary');
 
 router.route('/')
   .get(getVideos)
-  .post(protect, uploadVideo);
+  .post(protect, upload.fields([{ name: 'video', maxCount: 1 }, { name: 'thumbnail', maxCount: 1 }]), uploadVideo);
 
 router.route('/:id')
   .get(getVideoById);
