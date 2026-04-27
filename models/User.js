@@ -10,7 +10,11 @@ const userSchema = new mongoose.Schema({
   subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   subscriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   watchHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
-  likedVideos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }]
+  likedVideos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
+  isChannel: { type: Boolean, default: false },
+  channelName: { type: String, default: '' },
+  channelCategory: { type: String, default: 'General' },
+  channelBanner: { type: String, default: 'https://via.placeholder.com/800x200' }
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {
