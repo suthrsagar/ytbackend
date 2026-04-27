@@ -1,6 +1,7 @@
 const Video = require('../models/Video');
 const Comment = require('../models/Comment');
 const User = require('../models/User');
+const Channel = require('../models/Channel');
 
 // @desc    Get all videos (Feed)
 // @route   GET /api/videos
@@ -14,6 +15,7 @@ exports.getVideos = async (req, res) => {
 
     const videos = await Video.find({ type })
       .populate('creator', 'username avatar')
+      .populate('channelId', 'channelName channelLogo')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -31,6 +33,11 @@ exports.uploadVideo = async (req, res) => {
   try {
     const { title, description, videoUrl, thumbnailUrl, duration, type, category, tags } = req.body;
     
+    const user = await User.findById(req.user.id);
+    if (!user.channelId) {
+      return res.status(400).json({ message: 'Channel is required to upload a video. Please create a channel first.' });
+    }
+
     let finalType = type;
     if (!finalType || finalType === 'auto') {
       finalType = (duration && duration < 60) ? 'short' : 'video';
@@ -45,10 +52,16 @@ exports.uploadVideo = async (req, res) => {
       duration: duration || 0,
       category: category || 'All',
       tags: tags || [],
-      creator: req.user.id
+      creator: user._id,
+      channelId: user.channelId
     });
 
     const savedVideo = await newVideo.save();
+    
+    // Populate channel info to return
+    await savedVideo.populate('channelId', 'channelName channelLogo');
+    await savedVideo.populate('creator', 'username avatar');
+
     res.status(201).json(savedVideo);
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });

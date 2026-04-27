@@ -6,6 +6,7 @@ const videoSchema = new mongoose.Schema({
   videoUrl: { type: String, required: true },
   thumbnailUrl: { type: String },
   creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  channelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Channel', required: true },
   type: { type: String, enum: ['video', 'short'], default: 'video' },
   duration: { type: Number, default: 0 },
   category: { type: String, default: 'All' },

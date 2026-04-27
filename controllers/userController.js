@@ -1,10 +1,12 @@
 const User = require('../models/User');
+const Channel = require('../models/Channel');
 
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id)
       .populate('subscribers', 'username avatar')
-      .populate('subscriptions', 'username avatar');
+      .populate('subscriptions', 'username avatar')
+      .populate('channelId');
     if (user) {
       res.json(user);
     } else {
@@ -72,19 +74,29 @@ exports.searchUsers = async (req, res) => {
 // NEW: Create Channel logic
 exports.createChannel = async (req, res) => {
   try {
-    const { channelName, channelDescription, channelCategory, bannerUrl } = req.body;
+    const { channelName, description, channelLogo, bannerUrl } = req.body;
     
+    if (!channelName || !description) {
+      return res.status(400).json({ message: 'Channel Name and Description are required' });
+    }
+
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    user.isChannel = true;
-    user.channelName = channelName;
-    user.bio = channelDescription; // Using bio as description
-    user.channelCategory = channelCategory;
-    if (bannerUrl) user.channelBanner = bannerUrl;
+    const newChannel = new Channel({
+      channelName,
+      description,
+      channelLogo: channelLogo || user.avatar,
+      bannerUrl,
+      user: user._id
+    });
 
+    const savedChannel = await newChannel.save();
+
+    user.channelId = savedChannel._id;
     await user.save();
-    res.json(user);
+
+    res.json({ success: true, channel: savedChannel });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
