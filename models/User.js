@@ -7,8 +7,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   avatar: { type: String, default: 'https://res.cloudinary.com/demo/image/upload/v1583344600/sample.jpg' },
   bio: { type: String, default: '' },
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  subscriptions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  watchHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }],
+  likedVideos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }]
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

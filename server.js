@@ -27,10 +27,12 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const streamRoutes = require('./routes/stream');
+const videoRoutes = require('./routes/video');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/streams', streamRoutes);
+app.use('/api/videos', videoRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket) => {
