@@ -6,7 +6,8 @@ const {
   getVideoById, 
   likeVideo, 
   addComment, 
-  getVideoComments 
+  getVideoComments,
+  incrementView
 } = require('../controllers/videoController');
 const { protect } = require('../middlewares/auth');
 const { upload } = require('../utils/cloudinary');
@@ -17,6 +18,9 @@ router.route('/')
 
 router.route('/:id')
   .get(getVideoById);
+
+router.route('/:id/view')
+  .post(incrementView);
 
 router.route('/:id/like')
   .post(protect, likeVideo);

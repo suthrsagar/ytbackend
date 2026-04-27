@@ -82,15 +82,29 @@ exports.uploadVideo = async (req, res) => {
 exports.getVideoById = async (req, res) => {
   try {
     const video = await Video.findById(req.params.id)
-      .populate('creator', 'username avatar subscribers');
+      .populate('creator', 'username avatar')
+      .populate('channelId', 'channelName channelLogo subscribers');
     
     if (!video) return res.status(404).json({ message: 'Video not found' });
 
-    // Increment views
+    res.json(video);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
+// @desc    Increment view count
+// @route   POST /api/videos/:id/view
+// @access  Public
+exports.incrementView = async (req, res) => {
+  try {
+    const video = await Video.findById(req.params.id);
+    if (!video) return res.status(404).json({ message: 'Video not found' });
+
     video.views += 1;
     await video.save();
 
-    res.json(video);
+    res.json({ views: video.views });
   } catch (error) {
     res.status(500).json({ message: 'Server Error', error: error.message });
   }

@@ -101,3 +101,49 @@ exports.createChannel = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.subscribeChannel = async (req, res) => {
+  try {
+    const channelId = req.params.id;
+    const channel = await Channel.findById(channelId);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!channel) return res.status(404).json({ message: 'Channel not found' });
+
+    if (!currentUser.subscriptions.includes(channel._id)) {
+      currentUser.subscriptions.push(channel._id);
+      if (!channel.subscribers.includes(currentUser._id)) {
+        channel.subscribers.push(currentUser._id);
+      }
+      await currentUser.save();
+      await channel.save();
+      res.json({ message: 'Subscribed successfully', subscribersCount: channel.subscribers.length });
+    } else {
+      res.status(400).json({ message: 'Already subscribed' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.unsubscribeChannel = async (req, res) => {
+  try {
+    const channelId = req.params.id;
+    const channel = await Channel.findById(channelId);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!channel) return res.status(404).json({ message: 'Channel not found' });
+
+    if (currentUser.subscriptions.includes(channel._id)) {
+      currentUser.subscriptions = currentUser.subscriptions.filter(id => id.toString() !== channel._id.toString());
+      channel.subscribers = channel.subscribers.filter(id => id.toString() !== currentUser._id.toString());
+      await currentUser.save();
+      await channel.save();
+      res.json({ message: 'Unsubscribed successfully', subscribersCount: channel.subscribers.length });
+    } else {
+      res.status(400).json({ message: 'Not subscribed to this channel' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
