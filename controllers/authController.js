@@ -14,7 +14,9 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = await User.create({ username, email, password });
+    const avatarUrl = req.file ? req.file.path : 'https://via.placeholder.com/150';
+
+    const user = await User.create({ username, email, password, avatar: avatarUrl });
     if (user) {
       res.status(201).json({
         _id: user._id,

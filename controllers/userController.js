@@ -147,3 +147,19 @@ exports.unsubscribeChannel = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.updateProfileImage = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (!req.file) return res.status(400).json({ message: 'No image provided' });
+
+    user.avatar = req.file.path;
+    await user.save();
+
+    res.json({ success: true, avatar: user.avatar });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
