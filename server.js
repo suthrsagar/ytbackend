@@ -26,39 +26,43 @@ app.use(express.json());
 // Routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
-const streamRoutes = require('./routes/stream');
-const videoRoutes = require('./routes/video');
+const rideRoutes = require('./routes/ride');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/streams', streamRoutes);
-app.use('/api/videos', videoRoutes);
+app.use('/api/rides', rideRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Join a specific stream room
-  socket.on('joinStream', (streamId) => {
-    socket.join(streamId);
-    console.log(`User joined stream: ${streamId}`);
+  // Join a specific ride room for real-time updates
+  socket.on('joinRide', (rideId) => {
+    socket.join(rideId);
+    console.log(`User joined ride: ${rideId}`);
   });
 
-  // Handle chat messages
-  socket.on('sendMessage', (data) => {
-    // data should contain { streamId, user: { username, avatar }, message }
-    io.to(data.streamId).emit('newMessage', data);
+  // Handle location updates from driver
+  socket.on('updateLocation', (data) => {
+    // data: { rideId, location: { lat, lng } }
+    io.to(data.rideId).emit('locationUpdated', data.location);
   });
 
-  // Handle likes/hearts
-  socket.on('sendLike', (streamId) => {
-    io.to(streamId).emit('newLike');
+  // Handle status updates
+  socket.on('rideStatusUpdate', (data) => {
+    // data: { rideId, status }
+    io.to(data.rideId).emit('statusUpdated', data.status);
   });
 
-  // Handle viewers count (basic implementation)
-  socket.on('leaveStream', (streamId) => {
-    socket.leave(streamId);
-    console.log(`User left stream: ${streamId}`);
+  // Driver going online/offline
+  socket.on('driverStatus', (data) => {
+    // Notify passengers searching for rides
+    io.emit('driverStatusChanged', data);
+  });
+
+  socket.on('leaveRide', (rideId) => {
+    socket.leave(rideId);
+    console.log(`User left ride: ${rideId}`);
   });
 
   socket.on('disconnect', () => {
