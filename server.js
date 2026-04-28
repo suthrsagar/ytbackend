@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('Ride Booking API is running');
+  res.send('Ride New  Booking API is running');
 });
 
 const PORT = process.env.PORT || 5000;
