@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('StreamSphere API is running');
+  res.send('rider API is running');
 });
 
 const PORT = process.env.PORT || 5000;
