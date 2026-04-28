@@ -1,31 +1,20 @@
 const express = require('express');
 const router = express.Router();
 const { 
-  requestRide, 
+  createRide, 
   getNearbyDrivers, 
   acceptRide, 
   updateRideStatus, 
-  getCurrentRide,
-  getAvailableRides
+  getActiveRide, 
+  getAvailableRides 
 } = require('../controllers/rideController');
-const { protect } = require('../middlewares/auth');
+const { protect, authorize } = require('../middlewares/auth');
 
-router.route('/request')
-  .post(protect, requestRide);
-
-router.route('/drivers/nearby')
-  .get(protect, getNearbyDrivers);
-
-router.route('/available')
-  .get(protect, getAvailableRides);
-
-router.route('/current')
-  .get(protect, getCurrentRide);
-
-router.route('/:id/accept')
-  .put(protect, acceptRide);
-
-router.route('/:id/status')
-  .put(protect, updateRideStatus);
+router.post('/create', protect, authorize('passenger'), createRide);
+router.get('/nearby-drivers', protect, getNearbyDrivers);
+router.get('/active', protect, getActiveRide);
+router.get('/available', protect, authorize('rider'), getAvailableRides);
+router.put('/:id/accept', protect, authorize('rider'), acceptRide);
+router.put('/:id/status', protect, updateRideStatus);
 
 module.exports = router;

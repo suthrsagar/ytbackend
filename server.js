@@ -15,7 +15,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST']
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
 });
 
@@ -25,18 +25,16 @@ app.use(express.json());
 
 // Routes
 const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
 const rideRoutes = require('./routes/ride');
 
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
 app.use('/api/rides', rideRoutes);
 
 // Socket.io Logic
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Join a specific ride room for real-time updates
+  // Join a specific ride room for real-time tracking
   socket.on('joinRide', (rideId) => {
     socket.join(rideId);
     console.log(`User joined ride: ${rideId}`);
@@ -71,11 +69,10 @@ io.on('connection', (socket) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('rider API is running');
+  res.send('Ride Booking API is running');
 });
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
-  console.log('Cloudinary Connected');
 });

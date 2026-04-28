@@ -11,12 +11,11 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'streamsphere',
-    allowedFormats: ['jpg', 'png', 'jpeg', 'mp4'],
-    resource_type: 'auto'
+    folder: 'ridex_profiles',
+    allowed_formats: ['jpg', 'png', 'jpeg']
   }
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 module.exports = { cloudinary, upload };
